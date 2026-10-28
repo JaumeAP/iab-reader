@@ -442,7 +442,7 @@ def bed_definition_parser(bytes, **kwargs):
 	if AudioDescription.uint & 128:  # ascii is only on 7 bits (10000000)
 		while True:
 			AudioDescriptionText = b.read("bits:8")
-			if not AudioDescriptionText:
+			if not AudioDescriptionText.uint:  # the null terminator; a Bits object itself is always true
 				break
 			p.print("AudioDescriptionText : %s" % AudioDescriptionText, "(%c)" % AudioDescriptionText.uint)
 
@@ -537,8 +537,10 @@ def object_definition_parser(bytes, **kwargs):
 			PanInfoExists = True
 
 		if i > 0:
-			PanInfoExists = b.read("bits:1")
-			p1.print("PanInfoExists %s (%s)" % (PanInfoExists, bool(PanInfoExists)))
+			# bool() of a bitstring Bits is True for any non-empty Bits, even 0b0: test the value.
+			PanInfoExistsBits = b.read("bits:1")
+			PanInfoExists = bool(PanInfoExistsBits.uint)
+			p1.print("PanInfoExists %s (%s)" % (PanInfoExistsBits, PanInfoExists))
 
 		if bool(PanInfoExists):
 
@@ -635,7 +637,7 @@ def object_definition_parser(bytes, **kwargs):
 	if AudioDescription.uint & 128:  # ascii is only on 7 bits (10000000)
 		while True:
 			AudioDescriptionText = b.read("bits:8")
-			if not AudioDescriptionText:
+			if not AudioDescriptionText.uint:  # the null terminator; a Bits object itself is always true
 				break
 			p.print("AudioDescriptionText : %s" % AudioDescriptionText, "(%c)" % AudioDescriptionText.uint)
 
